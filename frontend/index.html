@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>StudyMate</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- ========================= -->
+    <!-- NAVBAR -->
+    <!-- ========================= -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            StudyMate
+        </div>
+
+        <nav>
+
+            <a href="#home">Home</a>
+
+            <a href="#notes">Notes</a>
+
+            <a href="#about">About</a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ========================= -->
+    <!-- HERO SECTION -->
+    <!-- ========================= -->
+
+    <main>
+
+        <section
+            class="hero"
+            id="home"
+        >
+
+            <div class="hero-content">
+
+                <p class="tag">
+                    YOUR PERSONAL STUDY ASSISTANT
+                </p>
+
+                <h1>
+                    Learn smarter with
+                    <span>StudyMate</span>
+                </h1>
+
+                <p class="hero-description">
+                    Organize your study notes, track important
+                    topics and build your knowledge in one place.
+                </p>
+
+                <button
+                    class="primary-btn"
+                    id="addNoteBtn"
+                >
+                    + Add New Note
+                </button>
+
+            </div>
+
+
+            <!-- ========================= -->
+            <!-- ADD NOTE FORM -->
+            <!-- ========================= -->
+
+            <div
+                class="note-form"
+                id="noteForm"
+            >
+
+                <h2>
+                    Create a New Note
+                </h2>
+
+                <input
+                    type="text"
+                    id="noteTitle"
+                    placeholder="Note title"
+                >
+
+                <input
+                    type="text"
+                    id="noteDescription"
+                    placeholder="Note description"
+                >
+
+                <input
+                    type="number"
+                    id="noteTopics"
+                    placeholder="Number of topics"
+                    min="1"
+                >
+
+                <button
+                    class="primary-btn"
+                    id="saveNoteBtn"
+                >
+                    Save Note
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- NOTES SECTION -->
+        <!-- ========================= -->
+
+        <section
+            class="notes-section"
+            id="notes"
+        >
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="section-label">
+                        YOUR KNOWLEDGE
+                    </p>
+
+                    <h2>
+                        My Study Notes
+                    </h2>
+
+                </div>
+
+                <p class="section-description">
+                    Keep your important concepts organized
+                    and easy to access.
+                </p>
+
+            </div>
+
+
+            <!-- JavaScript will create note cards here -->
+
+            <div
+                class="notes-container"
+                id="notesContainer"
+            >
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- ABOUT SECTION -->
+        <!-- ========================= -->
+
+        <section
+            class="about-section"
+            id="about"
+        >
+
+            <div class="about-content">
+
+                <p class="section-label">
+                    ABOUT STUDYMATE
+                </p>
+
+                <h2>
+                    Built by Aditi Sharma while learning
+                    Full-Stack AI Development
+                </h2>
+
+                <p>
+                    StudyMate is a beginner-friendly project
+                    built using HTML, CSS and JavaScript.
+                    Later, it will be upgraded with React,
+                    FastAPI, MySQL and AI features.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ========================= -->
+    <!-- FOOTER -->
+    <!-- ========================= -->
+
+    <footer>
+
+        <p>
+            © 2026 StudyMate
+        </p>
+
+        <p>
+            Built by Aditi Sharma while learning Full-Stack AI Development
+        </p>
+
+    </footer>
+
+
+    <!-- ========================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ========================= -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

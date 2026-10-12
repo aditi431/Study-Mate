@@ -1,0 +1,869 @@
+/* =========================================
+   RESET
+========================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html {
+    scroll-behavior: smooth;
+}
+
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f7f8fc;
+
+    color: #1f2937;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+.navbar {
+
+    width: 100%;
+
+    padding: 20px 8%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    background: white;
+
+    border-bottom: 1px solid #e5e7eb;
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+}
+
+
+.logo {
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    color: #111827;
+
+}
+
+
+.navbar nav {
+
+    display: flex;
+
+    gap: 30px;
+
+}
+
+
+.navbar nav a {
+
+    text-decoration: none;
+
+    color: #4b5563;
+
+    font-size: 15px;
+
+    transition: 0.2s;
+
+}
+
+
+.navbar nav a:hover {
+
+    color: #111827;
+
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.hero {
+
+    min-height: 600px;
+
+    padding: 100px 8%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef2ff,
+            #f8fafc
+        );
+
+}
+
+
+.hero-content {
+
+    max-width: 750px;
+
+}
+
+
+.tag {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    color: #6366f1;
+
+    margin-bottom: 15px;
+
+}
+
+
+.hero h1 {
+
+    font-size: clamp(40px, 6vw, 68px);
+
+    line-height: 1.1;
+
+    margin-bottom: 25px;
+
+    color: #111827;
+
+}
+
+
+.hero h1 span {
+
+    color: #6366f1;
+
+}
+
+
+.hero-description {
+
+    max-width: 600px;
+
+    margin: 0 auto 30px;
+
+    color: #6b7280;
+
+    font-size: 18px;
+
+}
+
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.primary-btn {
+
+    border: none;
+
+    padding: 13px 22px;
+
+    border-radius: 8px;
+
+    background: #6366f1;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.primary-btn:hover {
+
+    background: #4f46e5;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================
+   NOTE FORM
+========================================= */
+
+.note-form {
+
+    display: none;
+
+    width: 100%;
+
+    max-width: 500px;
+
+    margin-top: 40px;
+
+    padding: 30px;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+    text-align: left;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
+
+}
+
+
+.note-form h2 {
+
+    margin-bottom: 5px;
+
+    color: #111827;
+
+}
+
+
+.note-form input {
+
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    outline: none;
+
+}
+
+
+.note-form input:focus {
+
+    border-color: #6366f1;
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.1);
+
+}
+
+
+.note-form .primary-btn {
+
+    margin-top: 5px;
+
+}
+
+
+/* =========================================
+   NOTES SECTION
+========================================= */
+
+.notes-section {
+
+    padding: 90px 8%;
+
+    max-width: 1400px;
+
+    margin: auto;
+
+}
+
+
+.section-heading {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: end;
+
+    gap: 40px;
+
+    margin-bottom: 40px;
+
+}
+
+
+.section-label {
+
+    color: #6366f1;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.section-heading h2 {
+
+    font-size: 36px;
+
+    color: #111827;
+
+}
+
+
+.section-description {
+
+    max-width: 400px;
+
+    color: #6b7280;
+
+}
+
+
+/* =========================================
+   NOTES CONTAINER
+========================================= */
+
+.notes-container {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(260px, 1fr));
+
+    gap: 25px;
+
+}
+
+
+/* =========================================
+   NOTE CARD
+========================================= */
+
+.note-card {
+
+    padding: 25px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.05);
+
+    transition: 0.25s;
+
+}
+
+
+.note-card:hover {
+
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.08);
+
+}
+
+
+.note-card h3 {
+
+    margin-bottom: 10px;
+
+    font-size: 21px;
+
+    color: #111827;
+
+}
+
+
+.note-card p {
+
+    margin-bottom: 18px;
+
+    color: #6b7280;
+
+    font-size: 14px;
+
+}
+
+
+.note-card span {
+
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    background: #eef2ff;
+
+    color: #4f46e5;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================
+   DELETE BUTTON
+========================================= */
+
+.delete-btn {
+
+    margin-top: 18px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 7px;
+
+    background: #fff1f2;
+
+    color: #dc2626;
+
+    font-size: 13px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.delete-btn:hover {
+
+    background: #fee2e2;
+
+}
+
+
+/* =========================================
+   ABOUT SECTION
+========================================= */
+
+.about-section {
+
+    padding: 100px 8%;
+
+    background: #111827;
+
+    color: white;
+
+}
+
+
+.about-content {
+
+    max-width: 800px;
+
+    margin: auto;
+
+    text-align: center;
+
+}
+
+
+.about-content .section-label {
+
+    color: #a5b4fc;
+
+}
+
+
+.about-content h2 {
+
+    font-size: 40px;
+
+    line-height: 1.2;
+
+    margin-bottom: 20px;
+
+}
+
+
+.about-content p:last-child {
+
+    color: #d1d5db;
+
+    max-width: 650px;
+
+    margin: auto;
+
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer {
+
+    padding: 25px 8%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    background: #0f172a;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN
+========================================= */
+
+@media (max-width: 700px) {
+
+    .navbar {
+
+        padding: 18px 5%;
+
+    }
+
+
+    .navbar nav {
+
+        gap: 15px;
+
+    }
+
+
+    .hero {
+
+        padding: 70px 5%;
+
+    }
+
+
+    .hero h1 {
+
+        font-size: 42px;
+
+    }
+
+
+    .notes-section {
+
+        padding: 70px 5%;
+
+    }
+
+
+    .section-heading {
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+    }
+
+
+    .section-heading h2 {
+
+        font-size: 30px;
+
+    }
+
+
+    .about-section {
+
+        padding: 70px 5%;
+
+    }
+
+
+    .about-content h2 {
+
+        font-size: 32px;
+
+    }
+
+
+    footer {
+
+        flex-direction: column;
+
+        text-align: center;
+
+    }
+
+}
+
+/* =========================
+   NOTES SECTION
+========================= */
+
+.notes-section {
+    padding: 90px 8%;
+
+    max-width: 1200px;
+
+    margin: auto;
+}
+
+.section-label {
+    color: #6366f1;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 8px;
+}
+
+.notes-section h2 {
+    font-size: 38px;
+
+    margin-bottom: 40px;
+}
+
+
+/* =========================
+   NOTES GRID
+========================= */
+
+.notes-container {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(250px, 1fr));
+
+    gap: 25px;
+}
+
+
+/* =========================
+   NOTE CARD
+========================= */
+
+.note-card {
+    padding: 25px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.05);
+
+    transition: 0.25s;
+}
+
+.note-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.note-card h3 {
+    margin-bottom: 10px;
+
+    font-size: 21px;
+}
+
+.note-card p {
+    color: #6b7280;
+
+    font-size: 14px;
+
+    margin-bottom: 18px;
+}
+
+.note-card span {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    background: #eef2ff;
+
+    color: #4f46e5;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   DELETE BUTTON
+========================= */
+
+.delete-btn {
+    margin-top: 18px;
+
+    padding: 8px 14px;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 7px;
+
+    background: #fff1f2;
+
+    color: #dc2626;
+
+    cursor: pointer;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+footer {
+    padding: 25px 8%;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    background: #111827;
+
+    color: #9ca3af;
+
+    font-size: 13px;
+}
+
+/* =========================
+   NOTE FORM
+========================= */
+
+.note-form {
+    max-width: 600px;
+
+    margin-bottom: 50px;
+
+    padding: 25px;
+
+    background: white;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.05);
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+.note-form h3 {
+    font-size: 22px;
+
+    margin-bottom: 10px;
+}
+
+.note-form label {
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-top: 8px;
+}
+
+.note-form input,
+.note-form textarea {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    font-size: 14px;
+
+    font-family: inherit;
+
+    outline: none;
+}
+
+.note-form textarea {
+    min-height: 100px;
+
+    resize: vertical;
+}
+
+.note-form input:focus,
+.note-form textarea:focus {
+    border-color: #6366f1;
+}
+
+.save-btn {
+    margin-top: 10px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #6366f1;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #4f46e5;
+}
