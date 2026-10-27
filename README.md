@@ -4,15 +4,15 @@
 
 The goal is to help students organize their study materials, quickly find important information, and eventually use AI-powered tools to understand difficult topics and prepare for exams more effectively.
 
-## ✨ Key Features
+##  Key Features
 
-- 📝 **Smart Notes Management** — Create, view, edit, and delete study notes in one place.
-- 🔍 **Search Functionality** — Find specific notes and information quickly.
-- 📚 **Organized Learning** — Keep study materials structured for easier revision.
-- 🔐 **User Authentication** — Support for secure accounts and personalized study content.
-- 🤖 **AI Study Assistant** — Planned functionality to help students understand concepts and answer study-related questions.
-- 📄 **PDF Summarization & Chat** — Planned functionality to summarize study documents and ask questions about their content.
-- 🧠 **AI-Powered Revision** — Future plans include quizzes, flashcards, and personalized learning support.
+-  **Smart Notes Management** — Create, view, edit, and delete study notes in one place.
+-  **Search Functionality** — Find specific notes and information quickly.
+-  **Organized Learning** — Keep study materials structured for easier revision.
+-  **User Authentication** — Support for secure accounts and personalized study content.
+-  **AI Study Assistant** — Planned functionality to help students understand concepts and answer study-related questions.
+-  **PDF Summarization & Chat** — Planned functionality to summarize study documents and ask questions about their content.
+-  **AI-Powered Revision** — Future plans include quizzes, flashcards, and personalized learning support.
 
 ## 🛠️ Tech Stack
 
@@ -64,4 +64,4 @@ StudyMate aims to make studying more organized, accessible, and interactive by h
 
 ---
 
-*StudyMate is a work in progress, built with the vision of making learning simpler, smarter, and more organized.*
+
