@@ -1,4 +1,4 @@
-# 📚 StudyMate — Smart Study Notes & AI Learning Assistant
+# 📚 StudyMate - Smart Study Notes & AI Learning Assistant
 
 **StudyMate** is a student-focused web application designed to make learning and revision easier by bringing study notes and learning resources together in one place.
 
