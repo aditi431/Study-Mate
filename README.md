@@ -14,7 +14,7 @@ The goal is to help students organize their study materials, quickly find import
 -  **PDF Summarization & Chat** — Planned functionality to summarize study documents and ask questions about their content.
 -  **AI-Powered Revision** — Future plans include quizzes, flashcards, and personalized learning support.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Technology | Purpose |
 |---|---|
@@ -26,7 +26,7 @@ The goal is to help students organize their study materials, quickly find import
 | FastAPI | Backend APIs |
 | MySQL | Planned relational database integration |
 
-## 🏗️ How It Works
+## How It Works
 
 StudyMate follows a full-stack architecture:
 
@@ -35,7 +35,7 @@ StudyMate follows a full-stack architecture:
 - **Database:** Intended to store notes and other application data persistently.
 - **AI Integration:** Planned to provide intelligent study assistance, document-based question answering, and revision tools.
 
-## 🎯 Project Goals
+## Project Goals
 
 StudyMate aims to make studying more organized, accessible, and interactive by helping students:
 
@@ -45,7 +45,7 @@ StudyMate aims to make studying more organized, accessible, and interactive by h
 - Revise topics more efficiently.
 - Use AI as a learning companion rather than just a search tool.
 
-## 🚀 Future Scope
+## Future Scope
 
 - [ ] Complete persistent database integration.
 - [ ] Strengthen authentication and user-specific data access.
@@ -55,7 +55,7 @@ StudyMate aims to make studying more organized, accessible, and interactive by h
 - [ ] Generate summaries, quizzes, and flashcards.
 - [ ] Add personalized revision plans and learning progress tracking.
 
-## 👩‍💻 Author
+## Author
 
 **Aditi Sharma**
 
