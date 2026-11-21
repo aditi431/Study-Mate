@@ -88,7 +88,7 @@ def test_user_cannot_read_or_mutate_another_users_note(client, auth_headers) -> 
     assert original["title"] == "Private"
 
 
-def test_note_validation_and_ai_is_explicitly_unavailable(client, auth_headers) -> None:
+def test_note_validation(client, auth_headers) -> None:
     invalid = client.post(
         "/api/notes",
         headers=auth_headers["one"],
@@ -96,10 +96,46 @@ def test_note_validation_and_ai_is_explicitly_unavailable(client, auth_headers) 
     )
     assert invalid.status_code == 422
 
-    response = client.post(
-        "/api/ai/ask",
-        headers=auth_headers["one"],
-        json={"question": "Explain my notes", "mode": "simple"},
+
+def test_registration_login_and_ai_chat(client) -> None:
+    email = "reporter@example.com"
+    registration = client.post(
+        "/api/auth/register",
+        json={"email": email, "password": "test1234", "name": "Reporter"},
     )
-    assert response.status_code == 501
-    assert "not available yet" in response.json()["detail"]
+    assert registration.status_code == 201
+    headers = {"Authorization": f"Bearer {registration.json()['user_id']}"}
+
+    login = client.post(
+        "/api/auth/login",
+        json={"email": email, "password": "test1234"},
+    )
+    assert login.status_code == 200
+
+    me = client.get("/api/auth/me", headers=headers)
+    assert me.status_code == 200
+    assert me.json()["email"] == email
+
+    first = client.post(
+        "/api/ai/ask",
+        headers=headers,
+        json={"question": "Explain React state", "mode": "simple"},
+    )
+    assert first.status_code == 200
+    assert first.json()["session_id"]
+    assert "React" in first.json()["answer"]
+
+    follow_up = client.post(
+        "/api/ai/ask",
+        headers=headers,
+        json={
+            "question": "Give me an example",
+            "mode": "example",
+            "session_id": first.json()["session_id"],
+        },
+    )
+    assert follow_up.status_code == 200
+
+    sessions = client.get("/api/ai/sessions", headers=headers)
+    assert sessions.status_code == 200
+    assert sessions.json()[0]["message_count"] == 4

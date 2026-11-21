@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.api.dependencies import get_current_user, get_user_db
-from app.db.models import Base, Profile
+from app.db.database import get_db
+from app.db.models import Base, User
 from app.main import app
 
 USER_ONE = uuid.UUID("9bd852d2-1470-4b56-adb4-cdf0f12e2901")
@@ -29,8 +30,8 @@ def client() -> Generator[TestClient, None, None]:
     with factory() as session:
         session.add_all(
             [
-                Profile(id=USER_ONE, email="one@example.test"),
-                Profile(id=USER_TWO, email="two@example.test"),
+                User(id=str(USER_ONE), email="one@example.test", hashed_password="test"),
+                User(id=str(USER_TWO), email="two@example.test", hashed_password="test"),
             ]
         )
         session.commit()
@@ -44,7 +45,7 @@ def client() -> Generator[TestClient, None, None]:
             user_id = uuid.UUID(authorization.removeprefix("Bearer "))
         except ValueError as exc:
             raise HTTPException(status_code=401, detail="Invalid test bearer token.") from exc
-        return {"id": user_id}
+        return {"id": str(user_id)}
 
     def test_db(
         user: Annotated[dict, Depends(test_auth_user)],
@@ -52,7 +53,12 @@ def client() -> Generator[TestClient, None, None]:
         with factory() as session:
             yield session
 
+    def test_db_unprotected() -> Generator[Session, None, None]:
+        with factory() as session:
+            yield session
+
     app.dependency_overrides[get_current_user] = test_auth_user
+    app.dependency_overrides[get_db] = test_db_unprotected
     app.dependency_overrides[get_user_db] = test_db
     with TestClient(app) as test_client:
         yield test_client

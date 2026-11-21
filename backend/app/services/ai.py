@@ -5,7 +5,6 @@ responses based on the question topic and selected learning mode. In production,
 this would be replaced with a real LLM API call (e.g. Gemini, OpenAI, etc.).
 """
 import random
-import time
 
 # Topic-based knowledge banks for simulation
 _KNOWLEDGE_BANK = {
@@ -109,9 +108,6 @@ def generate_ai_answer(question: str, mode: str, user_notes: list[str] | None = 
     
     For now, we simulate this with a knowledge bank and intelligent templating.
     """
-    # Simulate processing time (like a real LLM)
-    time.sleep(random.uniform(0.8, 1.8))
-    
     topic = _detect_topic(question)
     topic_data = _KNOWLEDGE_BANK[topic]
     

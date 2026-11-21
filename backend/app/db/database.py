@@ -12,6 +12,10 @@ from app.db.models import Base
 def get_engine():
     settings = get_settings()
     url = settings.database_url
+    if url.startswith("postgres://"):
+        url = "postgresql+psycopg://" + url.removeprefix("postgres://")
+    elif url.startswith("postgresql://"):
+        url = "postgresql+psycopg://" + url.removeprefix("postgresql://")
     connect_args = {}
     if url.startswith("sqlite"):
         connect_args["check_same_thread"] = False

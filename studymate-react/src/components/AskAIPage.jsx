@@ -210,7 +210,7 @@ function AskAIPage({ token }) {
                 </div>
                 <div className="ai-status">
                     <span className="ai-status-dot" />
-                    {token ? "AI Ready" : "Sign in to chat"}
+                    {token ? "Local AI ready" : "Sign in to chat"}
                 </div>
             </section>
 
@@ -375,7 +375,7 @@ function AskAIPage({ token }) {
                     <p className="prototype-note">
                         <span aria-hidden="true">ⓘ</span>
                         {token
-                            ? "AI answers are powered by the StudyMate knowledge engine. Your notes are used as context."
+                            ? "Local StudyMate prototype: answers come from the built-in knowledge bank and your note collection."
                             : "Sign in to unlock AI-powered answers with your personal study context."}
                     </p>
                 </div>

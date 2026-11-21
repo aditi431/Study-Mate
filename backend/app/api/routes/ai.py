@@ -1,16 +1,14 @@
-"""AI question-answering endpoint with simulated GenAI responses."""
-import uuid
+"""Local AI prototype endpoints backed by the StudyMate knowledge service."""
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user, get_user_db
 from app.db.models import ChatMessage, ChatSession, Note
 from app.services.ai import generate_ai_answer
-
 router = APIRouter(prefix="/ai", tags=["AI"], dependencies=[Depends(get_current_user)])
 
 
@@ -46,60 +44,59 @@ def ask_question(
     user: Annotated[dict, Depends(get_current_user)],
     db: Annotated[Session, Depends(get_user_db)],
 ) -> AskResponse:
-    user_id = user["id"]
-
-    # Fetch user's note descriptions for context (simulates RAG)
-    user_notes = list(
-        db.scalars(
-            select(Note.description)
-            .where(Note.user_id == user_id)
-            .limit(10)
-        )
-    )
-
-    # Generate simulated AI answer (passes notes as context)
-    result = generate_ai_answer(body.question, body.mode, user_notes or None)
-
-    # Persist or create chat session
-    session_id = body.session_id
     session = None
-    if session_id:
+    if body.session_id:
         session = db.scalar(
             select(ChatSession).where(
-                ChatSession.id == session_id,
-                ChatSession.user_id == user_id,
+                ChatSession.id == body.session_id,
+                ChatSession.user_id == user["id"],
             )
         )
-
-    if session is None:
-        session = ChatSession(user_id=user_id)
+        if session is None:
+            raise HTTPException(status_code=404, detail="Chat session not found.")
+    else:
+        session = ChatSession(user_id=user["id"])
         db.add(session)
         db.flush()
 
-    # Save user message
-    user_msg = ChatMessage(
-        session_id=session.id,
-        role="user",
-        content=body.question,
-        mode=body.mode,
+    db.add(
+        ChatMessage(
+            session_id=session.id,
+            role="user",
+            content=body.question,
+            mode=body.mode,
+        )
     )
-    db.add(user_msg)
 
-    # Save assistant message
-    ai_msg = ChatMessage(
-        session_id=session.id,
-        role="assistant",
-        content=result["answer"],
-        mode=body.mode,
+    notes = list(
+        db.scalars(
+            select(Note)
+            .where(Note.user_id == user["id"])
+            .order_by(Note.created_at.desc())
+            .limit(20)
+        )
     )
-    db.add(ai_msg)
+    note_context = [
+        f"{note.title}: {note.description}"
+        for note in notes
+    ]
+    generated = generate_ai_answer(body.question, body.mode, note_context)
+
+    db.add(
+        ChatMessage(
+            session_id=session.id,
+            role="assistant",
+            content=generated["answer"],
+            mode=body.mode,
+        )
+    )
     db.commit()
 
     return AskResponse(
-        answer=result["answer"],
+        answer=generated["answer"],
         session_id=session.id,
-        topic_detected=result["topic_detected"],
-        sources=result["sources"],
+        topic_detected=generated["topic_detected"],
+        sources=generated["sources"],
     )
 
 
@@ -126,12 +123,16 @@ def list_sessions(
                 .limit(2)
             )
         )
+        message_count = db.scalar(
+            select(func.count(ChatMessage.id))
+            .where(ChatMessage.session_id == session.id)
+        ) or 0
         first_question = next((m.content for m in msgs if m.role == "user"), "New chat")
         result.append({
             "id": session.id,
             "preview": first_question[:60] + ("..." if len(first_question) > 60 else ""),
             "created_at": session.created_at.isoformat(),
-            "message_count": len(msgs),
+            "message_count": message_count,
         })
     return result
 
