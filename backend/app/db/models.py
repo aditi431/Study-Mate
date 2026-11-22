@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     CheckConstraint,
@@ -9,13 +9,16 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    func,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
     pass
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class User(Base):
@@ -29,7 +32,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
     name: Mapped[str | None] = mapped_column(String(120))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), nullable=False
+        DateTime, default=_utc_now, nullable=False
     )
 
     notes: Mapped[list["Note"]] = relationship(
@@ -60,12 +63,12 @@ class Note(Base):
     description: Mapped[str] = mapped_column(Text, nullable=False)
     topics_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), nullable=False
+        DateTime, default=_utc_now, nullable=False
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        server_default=func.now(),
-        onupdate=func.now(),
+        default=_utc_now,
+        onupdate=_utc_now,
         nullable=False,
     )
 
@@ -86,7 +89,7 @@ class ChatSession(Base):
         index=True,
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), nullable=False
+        DateTime, default=_utc_now, nullable=False
     )
 
     user: Mapped[User] = relationship(back_populates="chat_sessions")
@@ -112,7 +115,7 @@ class ChatMessage(Base):
     content: Mapped[str] = mapped_column(Text, nullable=False)
     mode: Mapped[str | None] = mapped_column(String(30))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now(), nullable=False
+        DateTime, default=_utc_now, nullable=False
     )
 
     session: Mapped[ChatSession] = relationship(back_populates="messages")

@@ -12,6 +12,22 @@ def test_health_is_available_without_authentication(client: TestClient) -> None:
     assert response.json() == {"status": "ok", "service": "StudyMate API"}
 
 
+def test_mysql_datetime_columns_do_not_require_server_defaults() -> None:
+    from sqlalchemy import DateTime
+    from sqlalchemy.dialects import mysql
+    from sqlalchemy.schema import CreateTable
+
+    from app.db.models import Base
+
+    for table in Base.metadata.sorted_tables:
+        ddl = str(CreateTable(table).compile(dialect=mysql.dialect())).lower()
+        for column in table.columns:
+            if isinstance(column.type, DateTime):
+                assert column.server_default is None
+        assert "current_timestamp" not in ddl
+        assert "now()" not in ddl
+
+
 def test_notes_require_authentication(client: TestClient) -> None:
     response = client.get("/api/notes")
 
