@@ -6,46 +6,12 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
-    envVars:
-      - key: ENVIRONMENT
-        value: "production"
-      - key: JWT_SECRET
-        sync: false
-      - key: JWT_ALGORITHM
-        value: "HS256"
-      - key: JWT_EXPIRE_MINUTES
-        value: "10080"
-      - key: DATABASE_URL
-        sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: ALLOWED_ORIGINS
-        value: "https://studymate-web.onrender.com"
-      - key: FORWARDED_ALLOW_IPS
-        value: "*"
-      - key: AI_DAILY_LIMIT_PER_USER
-        value: "20"
-      - key: AI_RATE_LIMIT_PER_MINUTE
-        value: "10"
-      - key: AI_REQUEST_TIMEOUT_SECONDS
-        value: "10"
-      - key: DEMO_MODE
-        value: "true"
-      - key: DEMO_EMAIL
-        value: "demo@studymate.local"
-      - key: DEMO_PASSWORD
-        sync: false
-      - key: DEMO_AI_DAILY_LIMIT_PER_USER
-        value: "3"
 
   - type: web
     name: studymate-web
     runtime: docker
     dockerfilePath: studymate-react/Dockerfile
     dockerContext: studymate-react
-    envVars:
-      - key: VITE_API_URL
-        sync: false
 
 databases:
   - name: studymate-db

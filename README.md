@@ -104,7 +104,7 @@ The tests cover authentication, note CRUD and ownership, AI limits, and demo-log
 
 ## Render deployment
 
-The root `render.yaml` defines a native Python FastAPI service and the `studymate-react` Docker frontend. The backend uses:
+The root `render.yaml` defines a native Python FastAPI service and the `studymate-react` Docker frontend. Environment variables are intentionally not declared in either YAML file: configure them in each Render service's **Environment** settings. The backend uses:
 
 - **Root directory:** `backend`
 - **Build command:** `pip install -r requirements.txt`
@@ -113,12 +113,12 @@ The root `render.yaml` defines a native Python FastAPI service and the `studymat
 
 Before deploying:
 
-1. Provide a MySQL `DATABASE_URL`, a random `JWT_SECRET`, and `DEMO_PASSWORD` in Render's private environment settings (`sync: false` variables).
-2. Set `VITE_API_URL` to `https://studymate-api.onrender.com/api`.
-3. Ensure `ALLOWED_ORIGINS` contains the exact deployed frontend origin (`https://studymate-web.onrender.com`, or the custom domain).
+1. In the backend Render service's Environment settings, set `ENVIRONMENT=production`, `DATABASE_URL`, `JWT_SECRET` (unique, at least 32 characters), `ALLOWED_ORIGINS`, and `FORWARDED_ALLOW_IPS=*`. To enable demo login, also set `DEMO_MODE=true` and a private `DEMO_PASSWORD` (at least 12 characters). The regular and demo AI limits default to 20 and 3.
+2. In the frontend Render service's Environment settings, set `VITE_API_URL=https://studymate-api.onrender.com/api`.
+3. Ensure backend `ALLOWED_ORIGINS` contains the exact deployed frontend origin (`https://studymate-web.onrender.com`, or the custom domain).
 4. Deploy the backend and frontend. The backend start command runs Alembic before Uvicorn; the frontend container writes its runtime API URL from `VITE_API_URL`.
 
-The existing Render PostgreSQL resource is retained in the blueprint to avoid removing or destroying an existing resource, but the backend now expects the private `DATABASE_URL` value. It is not automatically used when that variable is supplied; connect a MySQL-compatible database as requested, or deliberately change the URL to the retained PostgreSQL resource if PostgreSQL is preferred.
+The existing Render PostgreSQL resource is retained in the blueprint to avoid removing or destroying an existing resource, but the backend expects `DATABASE_URL` to be set in the Render dashboard. It is not automatically connected; enter the PostgreSQL connection string or connect a MySQL-compatible database.
 
 ## Planned work
 

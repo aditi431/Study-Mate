@@ -35,7 +35,7 @@ Required: `DATABASE_URL` and a unique `JWT_SECRET`. Set `ENVIRONMENT=production`
 
 AI limits default to 10 requests per IP per minute, 20 per user per day, and 3 per demo user per day. The in-memory tracker is process-local; use shared storage before deploying multiple workers or replicas.
 
-For a native Python deployment on Render, set the root directory to `backend`, the build command to `pip install -r requirements.txt`, and the start command to `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Set the health check path to `/api/health`.
+For a native Python deployment on Render, set the root directory to `backend`, the build command to `pip install -r requirements.txt`, and the start command to `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Set the health check path to `/api/health`. The Render YAML intentionally contains no environment variables: set `DATABASE_URL`, a strong `JWT_SECRET`, and `ENVIRONMENT=production` in the Render service's Environment settings. If enabling demo login, also set `DEMO_MODE=true` and `DEMO_PASSWORD` there.
 
 ## API
 
