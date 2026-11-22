@@ -21,13 +21,12 @@ Use Python 3.11 or newer and a MySQL server. The database URL should use the `my
 
 ```powershell
 cd backend
-Copy-Item .env.example .env
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt
 ```
 
-Edit `.env` and set a unique `JWT_SECRET` (at least 32 characters) and a valid `DATABASE_URL`. For example:
+The backend reads configuration from `backend/.env` (and process environment variables override it). Keep the existing `.env` file; it is private and is not committed. Set a unique `JWT_SECRET` (at least 32 characters) and a valid `DATABASE_URL`. For example:
 
 ```text
 DATABASE_URL=mysql+pymysql://studymate_user:your-password@localhost:3306/studymate
@@ -76,7 +75,7 @@ Set `VITE_API_URL` to the backend base URL, including `/api` (local default: `ht
 | `DEMO_AI_DAILY_LIMIT_PER_USER` | No | Demo account daily AI cap; defaults to 3 and must be lower than the regular cap. |
 | `VITE_API_URL` | No | Frontend API base URL, including `/api`. |
 
-The app fails at startup if `DATABASE_URL` or `JWT_SECRET` is missing. Placeholder values for `JWT_SECRET` and demo passwords are rejected. `GEMINI_API_KEY` is optional because no external LLM is currently called. The `.env.example` files contain no production secrets.
+The app loads `backend/.env`, not `.env.example`; process environment variables take precedence. It fails at startup if `DATABASE_URL` or `JWT_SECRET` is missing. Placeholder values for `JWT_SECRET` and demo passwords are rejected. `GEMINI_API_KEY` is optional because no external LLM is currently called. Never commit `.env` or paste its secrets into the Render blueprint; enter production values in Render's private environment settings.
 
 ## Demo account
 

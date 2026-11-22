@@ -15,13 +15,12 @@ FastAPI service for authentication, per-user study notes, and the local StudyMat
 ## Local setup
 
 ```powershell
-Copy-Item .env.example .env
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt
 ```
 
-Set `DATABASE_URL` and a unique `JWT_SECRET` (at least 32 characters) in `.env`. The example config uses MySQL; SQLite is also supported for local testing. Then start the API:
+The backend reads `backend/.env` (process environment variables override its values). Keep that file private; `.env.example` is not loaded by the application. Set `DATABASE_URL` and a unique `JWT_SECRET` (at least 32 characters) in `.env`. SQLite is supported for local testing. Then start the API:
 
 ```powershell
 alembic upgrade head

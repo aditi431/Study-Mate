@@ -1,7 +1,10 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic import AliasChoices, Field, SecretStr, ValidationError, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BACKEND_ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
 
 
 class Settings(BaseSettings):
@@ -25,7 +28,7 @@ class Settings(BaseSettings):
     demo_ai_daily_limit_per_user: int = Field(default=3, ge=1)
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=BACKEND_ENV_FILE,
         env_file_encoding="utf-8",
         extra="ignore",
         populate_by_name=True,
@@ -81,12 +84,12 @@ def get_settings() -> Settings:
             names = ", ".join(missing)
             raise RuntimeError(
                 f"Missing required environment variable(s): {names}. "
-                "Set them in the environment or copy backend/.env.example to backend/.env."
+                "Set them in backend/.env or in the process environment."
             ) from None
         issues = "; ".join(
             error["msg"] for error in exc.errors(include_input=False)
         )
         raise RuntimeError(
             f"Invalid application configuration: {issues}. "
-            "Check backend/.env.example and the environment variable values."
+            "Check backend/.env and the process environment variables."
         ) from None
