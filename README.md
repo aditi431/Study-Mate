@@ -1,67 +1,125 @@
-# 📚 StudyMate - Smart Study Notes & AI Learning Assistant
+# StudyMate
 
-**StudyMate** is a student-focused web application designed to make learning and revision easier by bringing study notes and learning resources together in one place.
+StudyMate is a full-stack study workspace for private notes and a local, knowledge-bank-based study assistant.
 
-The goal is to help students organize their study materials, quickly find important information, and eventually use AI-powered tools to understand difficult topics and prepare for exams more effectively.
+## What is implemented
 
-##  Key Features
+- Email/password sign-up and login with signed JWTs.
+- Authenticated note creation, editing, deletion, and search.
+- Per-user note and chat-session ownership in the SQLAlchemy data layer.
+- Configurable MySQL and PostgreSQL database URLs (MySQL is the recommended deployment target).
+- A local AI prototype with simple, example, and quiz response modes.
+- Per-IP per-minute and per-user daily AI limits.
+- Optional recruiter demo login with isolated sample data.
+- Health endpoint at `/api/health`.
 
--  **Smart Notes Management** — Create, view, edit, and delete study notes in one place.
--  **Search Functionality** — Find specific notes and information quickly.
--  **Organized Learning** — Keep study materials structured for easier revision.
--  **User Authentication** — Support for secure accounts and personalized study content.
--  **AI Study Assistant** — Planned functionality to help students understand concepts and answer study-related questions.
--  **PDF Summarization & Chat** — Planned functionality to summarize study documents and ask questions about their content.
--  **AI-Powered Revision** — Future plans include quizzes, flashcards, and personalized learning support.
+The active React application is [`studymate-react/`](./studymate-react/), which is the app built by Render. [`frontend/`](./frontend/) is an older static prototype and is not deployed by the current Render blueprint.
 
-## Tech Stack
+## Backend setup
 
-| Technology | Purpose |
-|---|---|
-| React | Frontend development |
-| Vite | Frontend tooling |
-| JavaScript | Application logic |
-| CSS | UI styling |
-| Python | Backend development |
-| FastAPI | Backend APIs |
-| MySQL | Planned relational database integration |
+Use Python 3.11 or newer and a MySQL server. The database URL should use the `mysql+pymysql` driver:
 
-## How It Works
+```powershell
+cd backend
+Copy-Item .env.example .env
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-dev.txt
+```
 
-StudyMate follows a full-stack architecture:
+Edit `.env` and set a unique `JWT_SECRET` (at least 32 characters) and a valid `DATABASE_URL`. For example:
 
-- **Frontend:** Provides the interface where students interact with their notes and study materials.
-- **Backend:** Handles application logic, API requests, and communication between the frontend and database.
-- **Database:** Intended to store notes and other application data persistently.
-- **AI Integration:** Planned to provide intelligent study assistance, document-based question answering, and revision tools.
+```text
+DATABASE_URL=mysql+pymysql://studymate_user:your-password@localhost:3306/studymate
+```
 
-## Project Goals
+Create the `studymate` database and its application user in MySQL before starting the API. For local testing without MySQL, `DATABASE_URL=sqlite:///./studymate.db` is also supported. The application creates missing tables on startup; Alembic migrations can be run with `alembic upgrade head`.
 
-StudyMate aims to make studying more organized, accessible, and interactive by helping students:
+Run the API from `backend/`:
 
-- Manage their notes in one place.
-- Spend less time searching for study materials.
-- Understand difficult concepts more easily.
-- Revise topics more efficiently.
-- Use AI as a learning companion rather than just a search tool.
+```powershell
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
 
-## Future Scope
+The API and interactive docs are at `http://127.0.0.1:8000` and `http://127.0.0.1:8000/docs`.
 
-- [ ] Complete persistent database integration.
-- [ ] Strengthen authentication and user-specific data access.
-- [ ] Add PDF uploads and text extraction.
-- [ ] Integrate an AI study assistant.
-- [ ] Implement document-based question answering using Retrieval-Augmented Generation (RAG).
-- [ ] Generate summaries, quizzes, and flashcards.
-- [ ] Add personalized revision plans and learning progress tracking.
+## Frontend setup
 
-## Author
+```powershell
+cd ..\studymate-react
+Copy-Item .env.example .env
+npm ci
+npm run dev
+```
 
-**Aditi Sharma**
+Set `VITE_API_URL` to the backend base URL, including `/api` (local default: `http://127.0.0.1:8000/api`). The Docker deployment reads `VITE_API_URL` when the container starts.
 
-- GitHub: [@aditi431](https://github.com/aditi431)
-- Project Repository: [Study-Mate](https://github.com/aditi431/Study-Mate)
+## Environment variables
+
+| Variable | Required | Purpose |
+|---|---:|---|
+| `DATABASE_URL` | Yes | SQLAlchemy URL. MySQL (`mysql+pymysql://...`) recommended; PostgreSQL and SQLite are supported. |
+| `JWT_SECRET` | Yes | Unique signing secret, at least 32 characters. Do not reuse the example value. |
+| `JWT_ALGORITHM` | No | JWT signing algorithm; defaults to `HS256`. |
+| `JWT_EXPIRE_MINUTES` | No | Token lifetime; defaults to 10080 (7 days). |
+| `APP_NAME` | No | API title; defaults to `StudyMate API`. |
+| `ENVIRONMENT` | No | Use `production` to reject SQLite. |
+| `ALLOWED_ORIGINS` | No | Comma-separated exact browser origins. `CORS_ORIGINS` remains a compatible alias. |
+| `FORWARDED_ALLOW_IPS` | No | Trusted proxy addresses for Uvicorn's client IP handling; Render is configured to trust its ingress proxy. |
+| `GEMINI_API_KEY` | No | Reserved for a future Gemini integration; the current AI prototype does not use it. |
+| `AI_DAILY_LIMIT_PER_USER` | No | Daily AI requests for regular users; defaults to 20. |
+| `AI_RATE_LIMIT_PER_MINUTE` | No | AI requests per client IP in a rolling minute; defaults to 10. |
+| `AI_REQUEST_TIMEOUT_SECONDS` | No | AI response timeout; defaults to 10 seconds. |
+| `DEMO_MODE` | No | Enables demo account seeding and the login endpoint; defaults to `false`. |
+| `DEMO_EMAIL` | No | Demo account email; defaults to `demo@studymate.local`. |
+| `DEMO_PASSWORD` | When demo is on | Demo password, at least 12 characters. Supply privately; no default password is shipped. |
+| `DEMO_AI_DAILY_LIMIT_PER_USER` | No | Demo account daily AI cap; defaults to 3 and must be lower than the regular cap. |
+| `VITE_API_URL` | No | Frontend API base URL, including `/api`. |
+
+The app fails at startup if `DATABASE_URL` or `JWT_SECRET` is missing. Placeholder values for `JWT_SECRET` and demo passwords are rejected. `GEMINI_API_KEY` is optional because no external LLM is currently called. The `.env.example` files contain no production secrets.
+
+## Demo account
+
+Set `DEMO_MODE=true` and provide `DEMO_PASSWORD` to enable the **Try Demo** button. The demo email defaults to `demo@studymate.local`; its password is the value configured by the operator in `DEMO_PASSWORD` (for Render, set it as a private environment variable). No real user password or notes are copied into the demo account. Demo notes and chat history are scoped to a dedicated demo user ID, and all note operations remain user-scoped.
+
+Seeded demo notes are added on startup. To reset only the demo account's notes and chat history, run from `backend/`:
+
+```powershell
+python reset_demo.py
+```
+
+## AI behavior and limits
+
+The current assistant returns answers from a bundled knowledge bank and appends a note-context hint. **It does not call Gemini or another LLM**, and it is not retrieval-augmented question answering over full note contents. Requests are limited to 2,000 characters, with configurable per-IP/minute and per-user/day limits. A `429` response displays a readable message in the chat. The in-memory limit tracker is per application process: restarts reset counters, and multiple replicas do not share counters. Use a shared limiter store before scaling across processes or replicas.
+
+## Tests
+
+The backend tests use FastAPI `TestClient` and isolated SQLite databases:
+
+```powershell
+cd backend
+python -m pytest
+```
+
+The tests cover authentication, note CRUD and ownership, AI limits, and demo-login isolation. No MySQL server is configured in this workspace, so live MySQL connectivity still needs verification against the deployment database.
+
+## Render deployment
+
+The root `render.yaml` defines the FastAPI Docker service (health check `/api/health`) and the `studymate-react` Docker frontend. Before deploying:
+
+1. Provide a MySQL `DATABASE_URL`, a random `JWT_SECRET`, and `DEMO_PASSWORD` in Render's private environment settings (`sync: false` variables).
+2. Set `VITE_API_URL` to `https://studymate-api.onrender.com/api`.
+3. Ensure `ALLOWED_ORIGINS` contains the exact deployed frontend origin (`https://studymate-web.onrender.com`, or the custom domain).
+4. Deploy the backend and frontend. The backend image runs Alembic before Uvicorn; the frontend container writes its runtime API URL from `VITE_API_URL`.
+
+The existing Render PostgreSQL resource is retained in the blueprint to avoid removing or destroying an existing resource, but the backend now expects the private `DATABASE_URL` value. It is not automatically used when that variable is supplied; connect a MySQL-compatible database as requested, or deliberately change the URL to the retained PostgreSQL resource if PostgreSQL is preferred.
+
+## Planned work
+
+- [ ] PDF uploads and text extraction.
+- [ ] Full-note retrieval-augmented question answering and external LLM integration.
+- [ ] Generated summaries, quizzes, flashcards, and personalized revision plans.
 
 ---
 
-
+Built by Aditi Sharma while learning full-stack application development.

@@ -1,19 +1,27 @@
 """Local AI prototype endpoints backed by the StudyMate knowledge service."""
+import asyncio
+import logging
 from typing import Annotated, Literal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user, get_user_db
+from app.api.limits import enforce_ai_limits
+from app.config import get_settings
 from app.db.models import ChatMessage, ChatSession, Note
 from app.services.ai import generate_ai_answer
+from app.services.demo import DEMO_USER_ID
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/ai", tags=["AI"], dependencies=[Depends(get_current_user)])
 
 
 class AskRequest(BaseModel):
-    question: str = Field(min_length=1, max_length=4000)
+    question: str = Field(min_length=1, max_length=2000)
     mode: Literal["simple", "example", "quiz"] = "simple"
     session_id: str | None = None
 
@@ -39,11 +47,20 @@ class ChatSessionResponse(BaseModel):
 
 
 @router.post("/ask", response_model=AskResponse)
-def ask_question(
+async def ask_question(
     body: AskRequest,
+    request: Request,
     user: Annotated[dict, Depends(get_current_user)],
     db: Annotated[Session, Depends(get_user_db)],
 ) -> AskResponse:
+    settings = get_settings()
+    enforce_ai_limits(
+        request,
+        user_id=user["id"],
+        is_demo_user=user["id"] == DEMO_USER_ID,
+        settings=settings,
+    )
+
     session = None
     if body.session_id:
         session = db.scalar(
@@ -80,7 +97,29 @@ def ask_question(
         f"{note.title}: {note.description}"
         for note in notes
     ]
-    generated = generate_ai_answer(body.question, body.mode, note_context)
+    try:
+        generated = await asyncio.wait_for(
+            asyncio.to_thread(
+                generate_ai_answer,
+                body.question,
+                body.mode,
+                note_context,
+            ),
+            timeout=settings.ai_request_timeout_seconds,
+        )
+    except asyncio.TimeoutError:
+        db.rollback()
+        raise HTTPException(
+            status_code=504,
+            detail="AI request timed out. Please try again.",
+        ) from None
+    except Exception as exc:
+        db.rollback()
+        logger.error("AI answer generation failed (%s)", type(exc).__name__)
+        raise HTTPException(
+            status_code=502,
+            detail="AI service is temporarily unavailable. Please try again.",
+        ) from None
 
     db.add(
         ChatMessage(

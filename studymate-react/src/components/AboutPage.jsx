@@ -45,12 +45,12 @@ function AboutPage({ onNavigate }) {
                     </article>
                     <article className="roadmap-card">
                         <span className="roadmap-number">03</span>
-                        <h3>Build a knowledge base</h3>
+                        <h3>Private study workspace</h3>
                         <p>
-                            Future plans include FastAPI, MySQL, and AI features
-                            such as retrieval over your own notes.
+                            FastAPI stores and searches notes per account using a
+                            configurable SQL database.
                         </p>
-                        <span className="roadmap-status">Planned</span>
+                        <span className="roadmap-status">Implemented</span>
                     </article>
                 </div>
             </section>

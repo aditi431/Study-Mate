@@ -12,6 +12,7 @@ function NotesSection({ showForm, onCloseForm, token, onAuthenticated, onSignOut
     const [errorState, setErrorState] = useState({ token: null, message: "" });
     const error = errorState.token === token ? errorState.message : "";
     const [deletingId, setDeletingId] = useState(null);
+    const [editingId, setEditingId] = useState(null);
 
     useEffect(() => {
         if (!token) {
@@ -98,6 +99,31 @@ function NotesSection({ showForm, onCloseForm, token, onAuthenticated, onSignOut
         }
     }
 
+    async function updateNote(id, changes) {
+        const saved = await apiRequest(`/notes/${encodeURIComponent(id)}`, {
+            token,
+            method: "PATCH",
+            body: JSON.stringify({
+                title: changes.title,
+                description: changes.description,
+                topics_count: changes.topics
+            })
+        });
+        const mapped = mapNote(saved);
+        const search = searchTerm.trim().toLocaleLowerCase();
+        setNotesState((current) => ({
+            token,
+            notes: (current.token === token ? current.notes : [])
+                .filter((note) => note.id !== id ||
+                    !search ||
+                    mapped.title.toLocaleLowerCase().includes(search) ||
+                    mapped.description.toLocaleLowerCase().includes(search))
+                .map((note) => note.id === id ? mapped : note)
+        }));
+        setEditingId(null);
+        setErrorState({ token, message: "" });
+    }
+
     return (
         <section className="notes-section" id="notes">
             <div className="section-heading">
@@ -137,22 +163,37 @@ function NotesSection({ showForm, onCloseForm, token, onAuthenticated, onSignOut
                     </div>
 
                     {error && <p className="form-error api-error" role="alert">{error}</p>}
-                    {showForm && <NoteForm onAddNote={addNote} onCancel={onCloseForm} />}
+                    {showForm && editingId === null && (
+                        <NoteForm onAddNote={addNote} onCancel={onCloseForm} />
+                    )}
 
                     {loading ? (
                         <div className="empty-state" role="status"><p>Loading your notes...</p></div>
                     ) : notes.length > 0 ? (
                         <div className="notes-container">
                             {notes.map((note) => (
-                                <NoteCard
-                                    key={note.id}
-                                    id={note.id}
-                                    title={note.title}
-                                    description={note.description}
-                                    topics={note.topics}
-                                    isDeleting={deletingId === note.id}
-                                    onDelete={deleteNote}
-                                />
+                                editingId === note.id ? (
+                                    <NoteForm
+                                        key={note.id}
+                                        initialNote={note}
+                                        onUpdateNote={updateNote}
+                                        onCancel={() => setEditingId(null)}
+                                    />
+                                ) : (
+                                    <NoteCard
+                                        key={note.id}
+                                        id={note.id}
+                                        title={note.title}
+                                        description={note.description}
+                                        topics={note.topics}
+                                        onEdit={(id) => {
+                                            setEditingId(id);
+                                            onCloseForm();
+                                        }}
+                                        isDeleting={deletingId === note.id}
+                                        onDelete={deleteNote}
+                                    />
+                                )
                             ))}
                         </div>
                     ) : (

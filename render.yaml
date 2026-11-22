@@ -7,19 +7,35 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: ENVIRONMENT
-        value: production
+        value: "production"
       - key: JWT_SECRET
-        generateValue: true
-      - key: JWT_ALGORITHM
-        value: HS256
-      - key: JWT_EXPIRE_MINUTES
-        value: 10080
-      - key: DATABASE_URL
-        fromDatabase:
-          name: studymate-db
-          property: connectionString
-      - key: CORS_ORIGINS
         sync: false
+      - key: JWT_ALGORITHM
+        value: "HS256"
+      - key: JWT_EXPIRE_MINUTES
+        value: "10080"
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: "https://studymate-web.onrender.com"
+      - key: FORWARDED_ALLOW_IPS
+        value: "*"
+      - key: AI_DAILY_LIMIT_PER_USER
+        value: "20"
+      - key: AI_RATE_LIMIT_PER_MINUTE
+        value: "10"
+      - key: AI_REQUEST_TIMEOUT_SECONDS
+        value: "10"
+      - key: DEMO_MODE
+        value: "true"
+      - key: DEMO_EMAIL
+        value: "demo@studymate.local"
+      - key: DEMO_PASSWORD
+        sync: false
+      - key: DEMO_AI_DAILY_LIMIT_PER_USER
+        value: "3"
 
   - type: web
     name: studymate-web

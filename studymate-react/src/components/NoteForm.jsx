@@ -1,9 +1,10 @@
 import { useState } from "react";
 
-function NoteForm({ onAddNote, onCancel }) {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [topics, setTopics] = useState("");
+function NoteForm({ onAddNote, onUpdateNote, initialNote, onCancel }) {
+    const editing = Boolean(initialNote);
+    const [title, setTitle] = useState(initialNote?.title || "");
+    const [description, setDescription] = useState(initialNote?.description || "");
+    const [topics, setTopics] = useState(String(initialNote?.topics ?? ""));
     const [error, setError] = useState("");
     const [saving, setSaving] = useState(false);
 
@@ -17,21 +18,28 @@ function NoteForm({ onAddNote, onCancel }) {
             return;
         }
 
-        if (!Number.isInteger(topicCount) || topicCount <= 0) {
-            setError("Enter a whole number of topics greater than zero.");
+        if (!Number.isInteger(topicCount) || (editing ? topicCount < 0 : topicCount <= 0)) {
+            setError(editing
+                ? "Enter a non-negative whole number of topics."
+                : "Enter a whole number of topics greater than zero.");
             return;
         }
 
         setSaving(true);
         try {
-            await onAddNote({
+            const noteData = {
                 title: title.trim(),
                 description: description.trim(),
                 topics: topicCount
-            });
-            setTitle("");
-            setDescription("");
-            setTopics("");
+            };
+            if (editing) {
+                await onUpdateNote(initialNote.id, noteData);
+            } else {
+                await onAddNote(noteData);
+                setTitle("");
+                setDescription("");
+                setTopics("");
+            }
             onCancel();
         } catch (saveError) {
             setError(saveError.message || "Could not save this note.");
@@ -48,8 +56,8 @@ function NoteForm({ onAddNote, onCancel }) {
         >
             <div className="form-heading">
                 <div>
-                    <p className="form-kicker">NEW NOTE</p>
-                    <h3>Create a New Note</h3>
+                    <p className="form-kicker">{editing ? "EDIT NOTE" : "NEW NOTE"}</p>
+                    <h3>{editing ? "Update Note" : "Create a New Note"}</h3>
                 </div>
                 <button
                     className="form-close"
@@ -82,7 +90,7 @@ function NoteForm({ onAddNote, onCancel }) {
             <input
                 id="note-topics"
                 type="number"
-                min="1"
+                min={editing ? "0" : "1"}
                 step="1"
                 placeholder="e.g. 5"
                 value={topics}
@@ -93,7 +101,7 @@ function NoteForm({ onAddNote, onCancel }) {
 
             <div className="form-actions">
                 <button type="submit" className="save-btn" disabled={saving}>
-                    {saving ? "Saving..." : "Save Note"}
+                    {saving ? "Saving..." : editing ? "Save Changes" : "Save Note"}
                 </button>
                 <button type="button" className="cancel-btn" disabled={saving} onClick={onCancel}>
                     Cancel

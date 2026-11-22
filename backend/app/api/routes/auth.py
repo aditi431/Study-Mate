@@ -7,9 +7,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import get_current_user
+from app.config import get_settings
 from app.db.database import get_db
 from app.db.models import User
 from app.services.auth import create_access_token, hash_password, verify_password
+from app.services.demo import DEMO_USER_ID
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -33,6 +35,15 @@ class AuthResponse(BaseModel):
     name: str | None
 
 
+def _auth_response(user: User) -> AuthResponse:
+    return AuthResponse(
+        access_token=create_access_token(user.id, user.email),
+        user_id=user.id,
+        email=user.email,
+        name=user.name,
+    )
+
+
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
 def register(
     data: RegisterRequest,
@@ -53,13 +64,7 @@ def register(
     db.add(user)
     db.commit()
     db.refresh(user)
-    token = create_access_token(user.id, user.email)
-    return AuthResponse(
-        access_token=token,
-        user_id=user.id,
-        email=user.email,
-        name=user.name,
-    )
+    return _auth_response(user)
 
 
 @router.post("/login", response_model=AuthResponse)
@@ -73,13 +78,27 @@ def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
         )
-    token = create_access_token(user.id, user.email)
-    return AuthResponse(
-        access_token=token,
-        user_id=user.id,
-        email=user.email,
-        name=user.name,
-    )
+    return _auth_response(user)
+
+
+@router.post("/demo-login", response_model=AuthResponse)
+def demo_login(
+    db: Annotated[Session, Depends(get_db)],
+) -> AuthResponse:
+    settings = get_settings()
+    if not settings.demo_mode:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Demo login is not enabled.",
+        )
+
+    user = db.get(User, DEMO_USER_ID)
+    if user is None or user.email != settings.demo_email.strip().lower():
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Demo account is not ready. Please try again later.",
+        )
+    return _auth_response(user)
 
 
 @router.get("/me")

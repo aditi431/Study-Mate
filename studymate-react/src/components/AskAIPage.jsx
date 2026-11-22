@@ -351,6 +351,7 @@ function AskAIPage({ token }) {
                         <textarea
                             ref={inputRef}
                             rows="1"
+                            maxLength={2000}
                             value={question}
                             onChange={(event) => setQuestion(event.target.value)}
                             onKeyDown={(event) => {

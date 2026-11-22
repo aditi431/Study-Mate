@@ -735,6 +735,12 @@ a {
     font-size: 14px;
 }
 
+.note-card-top .cancel-btn {
+    min-height: 28px;
+    padding: 0 9px;
+    font-size: 11px;
+}
+
 .delete-btn {
     padding: 6px 9px;
     border: 1px solid transparent;

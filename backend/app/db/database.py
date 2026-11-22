@@ -8,14 +8,20 @@ from app.config import get_settings
 from app.db.models import Base
 
 
+def normalize_database_url(url: str) -> str:
+    if url.startswith("postgres://"):
+        return "postgresql+psycopg://" + url.removeprefix("postgres://")
+    if url.startswith("postgresql://"):
+        return "postgresql+psycopg://" + url.removeprefix("postgresql://")
+    if url.startswith("mysql://"):
+        return "mysql+pymysql://" + url.removeprefix("mysql://")
+    return url
+
+
 @lru_cache
 def get_engine():
     settings = get_settings()
-    url = settings.database_url
-    if url.startswith("postgres://"):
-        url = "postgresql+psycopg://" + url.removeprefix("postgres://")
-    elif url.startswith("postgresql://"):
-        url = "postgresql+psycopg://" + url.removeprefix("postgresql://")
+    url = normalize_database_url(settings.database_url)
     connect_args = {}
     if url.startswith("sqlite"):
         connect_args["check_same_thread"] = False

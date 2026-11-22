@@ -7,19 +7,16 @@ from sqlalchemy import engine_from_config, pool
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from app.config import get_settings
+from app.db.database import normalize_database_url
 from app.db.models import Base
 
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-database_url = os.getenv("DATABASE_URL")
-if database_url:
-    if database_url.startswith("postgres://"):
-        database_url = "postgresql+psycopg://" + database_url.removeprefix("postgres://")
-    elif database_url.startswith("postgresql://"):
-        database_url = "postgresql+psycopg://" + database_url.removeprefix("postgresql://")
-    config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
+database_url = normalize_database_url(get_settings().database_url)
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 
 target_metadata = Base.metadata
 

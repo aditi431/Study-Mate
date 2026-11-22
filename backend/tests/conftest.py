@@ -1,4 +1,5 @@
 from collections.abc import Generator
+import os
 from typing import Annotated
 import uuid
 
@@ -8,6 +9,10 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy.pool import StaticPool
+
+os.environ["DATABASE_URL"] = "sqlite://"
+os.environ["JWT_SECRET"] = "test-only-signing-key-with-at-least-32-characters"
+os.environ["DEMO_MODE"] = "false"
 
 from app.api.dependencies import get_current_user, get_user_db
 from app.db.database import get_db
@@ -63,6 +68,36 @@ def client() -> Generator[TestClient, None, None]:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+    Base.metadata.drop_all(engine)
+    engine.dispose()
+
+
+@pytest.fixture
+def live_client() -> Generator[TestClient, None, None]:
+    from app.api.limits import ai_limit_tracker
+
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    Base.metadata.create_all(engine)
+    factory = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+
+    def test_db() -> Generator[Session, None, None]:
+        with factory() as session:
+            yield session
+
+    app.dependency_overrides[get_db] = test_db
+    app.dependency_overrides[get_user_db] = test_db
+    app.dependency_overrides.pop(get_current_user, None)
+    ai_limit_tracker.reset()
+    app.state.test_session_factory = factory
+    with TestClient(app) as test_client:
+        yield test_client
+    app.dependency_overrides.clear()
+    ai_limit_tracker.reset()
+    del app.state.test_session_factory
     Base.metadata.drop_all(engine)
     engine.dispose()
 

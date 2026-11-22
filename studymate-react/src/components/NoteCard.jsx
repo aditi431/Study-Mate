@@ -3,6 +3,7 @@ function NoteCard({
     title,
     description,
     topics,
+    onEdit,
     onDelete,
     isDeleting
 }) {
@@ -11,6 +12,14 @@ function NoteCard({
         <article className="note-card">
             <div className="note-card-top">
                 <span className="note-icon" aria-hidden="true">✦</span>
+                <button
+                    className="cancel-btn"
+                    type="button"
+                    onClick={() => onEdit(id)}
+                    aria-label={`Edit ${title}`}
+                >
+                    Edit
+                </button>
                 <button
                     className="delete-btn"
                     type="button"

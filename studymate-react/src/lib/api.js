@@ -1,4 +1,8 @@
-const apiBaseUrl = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api")
+const apiBaseUrl = (
+    window.STUDYMATE_API_URL ||
+    import.meta.env.VITE_API_URL ||
+    "http://127.0.0.1:8000/api"
+)
     .replace(/\/+$/, "");
 
 /**
@@ -59,6 +63,17 @@ export async function signIn(email, password) {
         throw new Error(result?.detail || "Authentication failed. Check your details and try again.");
     }
     return result; // { access_token, user_id, email, name }
+}
+
+export async function signInDemo() {
+    const response = await fetch(`${apiBaseUrl}/auth/demo-login`, {
+        method: "POST",
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok) {
+        throw new Error(result?.detail || "Demo login is unavailable. Please try again later.");
+    }
+    return result;
 }
 
 /**

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { signIn, signUp, saveToken } from "../lib/api";
+import { signIn, signInDemo, signUp, saveToken } from "../lib/api";
 
 function AuthPanel({ onAuthenticated }) {
     const [mode, setMode] = useState("signin");
@@ -28,6 +28,21 @@ function AuthPanel({ onAuthenticated }) {
             setPassword("");
         } catch (authError) {
             setError(authError.message || "Could not authenticate. Please try again.");
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function handleDemoLogin() {
+        setBusy(true);
+        setError("");
+        setMessage("");
+        try {
+            const result = await signInDemo();
+            saveToken(result.access_token);
+            onAuthenticated(result.access_token);
+        } catch (authError) {
+            setError(authError.message || "Demo login is unavailable. Please try again later.");
         } finally {
             setBusy(false);
         }
@@ -98,6 +113,16 @@ function AuthPanel({ onAuthenticated }) {
                 >
                     {mode === "signin" ? "Create account" : "I have an account"}
                 </button>
+                {mode === "signin" && (
+                    <button
+                        className="cancel-btn"
+                        type="button"
+                        disabled={busy}
+                        onClick={handleDemoLogin}
+                    >
+                        Try Demo
+                    </button>
+                )}
             </div>
         </form>
     );
