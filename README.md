@@ -105,12 +105,19 @@ The tests cover authentication, note CRUD and ownership, AI limits, and demo-log
 
 ## Render deployment
 
-The root `render.yaml` defines the FastAPI Docker service (health check `/api/health`) and the `studymate-react` Docker frontend. Before deploying:
+The root `render.yaml` defines a native Python FastAPI service and the `studymate-react` Docker frontend. The backend uses:
+
+- **Root directory:** `backend`
+- **Build command:** `pip install -r requirements.txt`
+- **Start command:** `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- **Health check:** `/api/health`
+
+Before deploying:
 
 1. Provide a MySQL `DATABASE_URL`, a random `JWT_SECRET`, and `DEMO_PASSWORD` in Render's private environment settings (`sync: false` variables).
 2. Set `VITE_API_URL` to `https://studymate-api.onrender.com/api`.
 3. Ensure `ALLOWED_ORIGINS` contains the exact deployed frontend origin (`https://studymate-web.onrender.com`, or the custom domain).
-4. Deploy the backend and frontend. The backend image runs Alembic before Uvicorn; the frontend container writes its runtime API URL from `VITE_API_URL`.
+4. Deploy the backend and frontend. The backend start command runs Alembic before Uvicorn; the frontend container writes its runtime API URL from `VITE_API_URL`.
 
 The existing Render PostgreSQL resource is retained in the blueprint to avoid removing or destroying an existing resource, but the backend now expects the private `DATABASE_URL` value. It is not automatically used when that variable is supplied; connect a MySQL-compatible database as requested, or deliberately change the URL to the retained PostgreSQL resource if PostgreSQL is preferred.
 
